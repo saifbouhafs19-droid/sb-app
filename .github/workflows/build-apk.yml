@@ -9,53 +9,57 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Setup JDK 17
+      - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
 
-      - name: Install dependencies
+      - name: Install npm dependencies
         working-directory: sb-apk
-        run: npm ci || npm install
+        run: npm install --no-audit --no-fund
 
-      - name: Sync web assets to Capacitor
-        working-directory: sb-apk
+      - name: Refresh web assets
         run: |
-          mkdir -p www
-          cp ../index.html ../styles.css ../app.js ../manifest.webmanifest ../sw.js www/ 2>/dev/null || true
-          cp ../icon-192.png ../icon-512.png www/ 2>/dev/null || true
-          npx cap sync android
+          mkdir -p sb-apk/www
+          cp -f index.html styles.css app.js manifest.webmanifest sw.js sb-apk/www/ || true
+          if [ -f icon-192.png ]; then cp -f icon-192.png icon-512.png sb-apk/www/; fi
+          ls -la sb-apk/www/
+
+      - name: Capacitor sync
+        working-directory: sb-apk
+        run: npx cap sync android
+
+      - name: Make gradlew executable
+        working-directory: sb-apk/android
+        run: chmod +x ./gradlew
 
       - name: Build Debug APK
         working-directory: sb-apk/android
-        run: |
-          chmod +x ./gradlew
-          ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Rename APK
+      - name: Stage APK
         run: |
           mkdir -p output
           cp sb-apk/android/app/build/outputs/apk/debug/app-debug.apk output/SB.apk
+          ls -la output/
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: SB-apk
           path: output/SB.apk
-
-      - name: Create release on tag push
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: output/SB.apk
+          if-no-files-found: error
