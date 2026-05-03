@@ -1,0 +1,11 @@
+{
+  "appId": "com.sb.transformation",
+  "appName": "SB",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0b1020"
+  }
+}

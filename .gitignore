@@ -1,0 +1,10 @@
+node_modules/
+*.log
+sb-apk/android/.gradle/
+sb-apk/android/build/
+sb-apk/android/app/build/
+sb-apk/android/local.properties
+sb-apk/android/.idea/
+sb-apk/android/captures/
+sb-apk/android/app/release/
+.DS_Store

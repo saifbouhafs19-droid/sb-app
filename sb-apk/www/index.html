@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1020" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SB" />
+<meta name="mobile-web-app-capable" content="yes" />
+<title>SB · Transformation</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">SB</div>
+      <div>
+        <div class="logo-title">SB</div>
+        <div class="logo-sub">Elite Transformation</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-tab="dashboard"><span>📊</span>Tableau de bord</button>
+      <button class="nav-item" data-tab="weight"><span>⚖️</span>Pesée quotidienne</button>
+      <button class="nav-item" data-tab="nutrition"><span>🥗</span>Nutrition</button>
+      <button class="nav-item" data-tab="workout"><span>🏋️</span>Sport</button>
+      <button class="nav-item" data-tab="habits"><span>💧</span>Habitudes</button>
+      <button class="nav-item" data-tab="profile"><span>👤</span>Profil & Objectifs</button>
+      <button class="nav-item" data-tab="rules"><span>📜</span>Règles d'or</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button id="exportBtn" class="ghost-btn">⬇ Exporter données</button>
+      <button id="resetBtn" class="ghost-btn danger">↺ Réinitialiser</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- DASHBOARD -->
+    <section class="tab active" id="tab-dashboard">
+      <header class="page-head">
+        <div>
+          <h1>Bonjour <span id="greetName">Champion</span> 👋</h1>
+          <p class="subtitle" id="greetDate"></p>
+        </div>
+        <div class="streak-badge">
+          <div class="streak-num" id="streakNum">0</div>
+          <div class="streak-lbl">jours consécutifs 🔥</div>
+        </div>
+      </header>
+
+      <div class="kpi-grid">
+        <div class="kpi card gradient-1">
+          <div class="kpi-label">Poids actuel</div>
+          <div class="kpi-value"><span id="kpiWeight">—</span> <small>kg</small></div>
+          <div class="kpi-foot" id="kpiWeightDelta">—</div>
+        </div>
+        <div class="kpi card gradient-2">
+          <div class="kpi-label">Objectif</div>
+          <div class="kpi-value"><span id="kpiGoal">80</span> <small>kg</small></div>
+          <div class="kpi-foot" id="kpiToGo">—</div>
+        </div>
+        <div class="kpi card gradient-3">
+          <div class="kpi-label">IMC</div>
+          <div class="kpi-value"><span id="kpiBmi">—</span></div>
+          <div class="kpi-foot" id="kpiBmiCat">—</div>
+        </div>
+        <div class="kpi card gradient-4">
+          <div class="kpi-label">Calories cible</div>
+          <div class="kpi-value"><span id="kpiCal">—</span> <small>kcal</small></div>
+          <div class="kpi-foot">Maintenance: <span id="kpiTdee">—</span></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <h2>📉 Évolution du poids</h2>
+            <span class="chip" id="weightSpan">—</span>
+          </div>
+          <canvas id="weightChart" height="220"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>🎯 Progression vers 80 kg</h2></div>
+          <div class="progress-wrap">
+            <div class="progress-info">
+              <div><strong id="progStart">—</strong><small>Départ</small></div>
+              <div><strong id="progNow">—</strong><small>Actuel</small></div>
+              <div><strong id="progGoal">80 kg</strong><small>Cible</small></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+            <div class="progress-pct" id="progPct">0%</div>
+          </div>
+          <div class="mini-stats">
+            <div><div class="mini-num" id="miniLost">0</div><div class="mini-lbl">kg perdus</div></div>
+            <div><div class="mini-num" id="miniDays">0</div><div class="mini-lbl">jours actifs</div></div>
+            <div><div class="mini-num" id="miniAvg">0</div><div class="mini-lbl">kg/sem moy</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head"><h2>✅ Check-list du jour</h2></div>
+          <ul class="checklist" id="todayChecklist"></ul>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>🍴 Repas du jour</h2></div>
+          <div id="todayMeals"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WEIGHT -->
+    <section class="tab" id="tab-weight">
+      <header class="page-head"><h1>⚖️ Pesée quotidienne</h1><p class="subtitle">Pèse-toi chaque matin à jeun, après les toilettes.</p></header>
+      <div class="card">
+        <div class="weight-form">
+          <div>
+            <label>Date</label>
+            <input type="date" id="weightDate" />
+          </div>
+          <div>
+            <label>Poids (kg)</label>
+            <input type="number" step="0.1" id="weightInput" placeholder="ex: 94.8" />
+          </div>
+          <div>
+            <label>Tour de ventre (cm) <span class="optional">optionnel</span></label>
+            <input type="number" step="0.1" id="waistInput" placeholder="ex: 102" />
+          </div>
+          <div>
+            <label>Note <span class="optional">optionnel</span></label>
+            <input type="text" id="weightNote" placeholder="Énergie, sommeil…" />
+          </div>
+          <button class="primary-btn" id="saveWeight">Enregistrer</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Historique</h2><span class="chip" id="historyCount">0 entrées</span></div>
+        <canvas id="weightChartFull" height="180"></canvas>
+        <div class="table-wrap">
+          <table class="data-table" id="weightTable">
+            <thead><tr><th>Date</th><th>Poids</th><th>Δ</th><th>Tour ventre</th><th>Note</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- NUTRITION -->
+    <section class="tab" id="tab-nutrition">
+      <header class="page-head">
+        <h1>🥗 Plan nutrition</h1>
+        <p class="subtitle">~2000 kcal · riche en protéines · 3 repas + 1 collation</p>
+      </header>
+
+      <div class="card cal-target">
+        <div>
+          <div class="big-num" id="nutriCal">2000</div>
+          <div class="big-lbl">kcal/jour cible</div>
+        </div>
+        <div class="macro-grid">
+          <div class="macro"><div class="macro-name">Protéines</div><div class="macro-val" id="macroP">—</div><div class="macro-bar"><span style="width:35%"></span></div></div>
+          <div class="macro"><div class="macro-name">Glucides</div><div class="macro-val" id="macroC">—</div><div class="macro-bar"><span style="width:40%;background:#f59e0b"></span></div></div>
+          <div class="macro"><div class="macro-name">Lipides</div><div class="macro-val" id="macroF">—</div><div class="macro-bar"><span style="width:25%;background:#ef4444"></span></div></div>
+        </div>
+      </div>
+
+      <div class="meal-grid" id="mealGrid"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head"><h2>🛒 Liste de courses (semaine)</h2></div>
+          <ul class="shopping" id="shoppingList"></ul>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>❌ Interdits 90 jours</h2></div>
+          <div class="forbidden">
+            <span>Soda</span><span>Fast-food</span><span>Pain blanc en excès</span>
+            <span>Sucre raffiné</span><span>Biscuits</span><span>Chips</span>
+            <span>Alcool</span><span>Manger la nuit</span><span>Jus industriels</span>
+            <span>Sauces grasses</span><span>Charcuterie</span><span>Frites</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKOUT -->
+    <section class="tab" id="tab-workout">
+      <header class="page-head"><h1>🏋️ Programme sportif</h1><p class="subtitle">6 séances/semaine · marche quotidienne 8 000–12 000 pas</p></header>
+      <div class="week-grid" id="weekGrid"></div>
+
+      <div class="card">
+        <div class="card-head"><h2>🏠 Circuit maison (4 tours)</h2></div>
+        <div class="circuit">
+          <div class="circuit-item"><div class="circuit-num">15</div><div>Pompes</div></div>
+          <div class="circuit-item"><div class="circuit-num">20</div><div>Squats</div></div>
+          <div class="circuit-item"><div class="circuit-num">20</div><div>Crunch</div></div>
+          <div class="circuit-item"><div class="circuit-num">15</div><div>Dips chaise</div></div>
+          <div class="circuit-item"><div class="circuit-num">30s</div><div>Gainage</div></div>
+        </div>
+        <p class="note">⏱️ ~25 minutes · repos 60s entre tours</p>
+      </div>
+    </section>
+
+    <!-- HABITS -->
+    <section class="tab" id="tab-habits">
+      <header class="page-head"><h1>💧 Habitudes quotidiennes</h1><p class="subtitle">Eau, pas, sommeil — les 3 piliers cachés.</p></header>
+      <div class="grid-3">
+        <div class="card habit-card">
+          <h2>💧 Eau</h2>
+          <div class="big-num"><span id="waterCount">0</span><small> / 10 verres</small></div>
+          <div class="water-glasses" id="waterGlasses"></div>
+          <p class="note">Cible : 2,5 à 3 L/jour</p>
+        </div>
+        <div class="card habit-card">
+          <h2>👟 Pas</h2>
+          <input type="number" id="stepsInput" placeholder="ex: 9500" />
+          <button class="primary-btn small" id="saveSteps">Sauvegarder</button>
+          <div class="big-num"><span id="stepsToday">0</span><small> pas</small></div>
+          <div class="progress-bar"><div class="progress-fill" id="stepsBar"></div></div>
+          <p class="note">Cible : 10 000 pas</p>
+        </div>
+        <div class="card habit-card">
+          <h2>😴 Sommeil</h2>
+          <input type="number" step="0.5" id="sleepInput" placeholder="ex: 7.5" />
+          <button class="primary-btn small" id="saveSleep">Sauvegarder</button>
+          <div class="big-num"><span id="sleepToday">0</span><small> h</small></div>
+          <div class="progress-bar"><div class="progress-fill" id="sleepBar"></div></div>
+          <p class="note">Cible : 7 h minimum</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="tab" id="tab-profile">
+      <header class="page-head"><h1>👤 Profil & objectifs</h1><p class="subtitle">Personnalise tes calculs.</p></header>
+      <div class="card">
+        <div class="form-grid">
+          <div><label>Prénom</label><input type="text" id="pName" /></div>
+          <div><label>Âge</label><input type="number" id="pAge" /></div>
+          <div><label>Sexe</label>
+            <select id="pSex"><option value="m">Homme</option><option value="f">Femme</option></select>
+          </div>
+          <div><label>Taille (cm)</label><input type="number" id="pHeight" /></div>
+          <div><label>Poids départ (kg)</label><input type="number" step="0.1" id="pStart" /></div>
+          <div><label>Poids objectif (kg)</label><input type="number" step="0.1" id="pGoal" /></div>
+          <div><label>Niveau d'activité</label>
+            <select id="pActivity">
+              <option value="1.2">Sédentaire</option>
+              <option value="1.375" selected>Légèrement actif</option>
+              <option value="1.55">Modérément actif</option>
+              <option value="1.725">Très actif</option>
+            </select>
+          </div>
+          <div><label>Déficit calorique (%)</label><input type="number" id="pDeficit" min="10" max="30" /></div>
+        </div>
+        <button class="primary-btn" id="saveProfile">Enregistrer le profil</button>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>📐 Calculs automatiques</h2></div>
+        <div class="calc-grid">
+          <div><div class="calc-lbl">IMC</div><div class="calc-val" id="cBmi">—</div></div>
+          <div><div class="calc-lbl">BMR (Mifflin)</div><div class="calc-val" id="cBmr">— kcal</div></div>
+          <div><div class="calc-lbl">TDEE (maintenance)</div><div class="calc-val" id="cTdee">— kcal</div></div>
+          <div><div class="calc-lbl">Cible perte</div><div class="calc-val" id="cTarget">— kcal</div></div>
+          <div><div class="calc-lbl">Protéines/jour</div><div class="calc-val" id="cProt">— g</div></div>
+          <div><div class="calc-lbl">Eau/jour</div><div class="calc-val" id="cWater">— L</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RULES -->
+    <section class="tab" id="tab-rules">
+      <header class="page-head"><h1>📜 Les 10 règles d'or</h1><p class="subtitle">Imprime-les, colle-les sur ton frigo.</p></header>
+      <div class="rules-grid">
+        <div class="rule"><div class="rule-num">1</div><h3>Mode de vie, pas régime</h3><p>On ne fait pas un régime temporaire. On change durablement.</p></div>
+        <div class="rule"><div class="rule-num">2</div><h3>Protéines à chaque repas</h3><p>Œufs, poulet, poisson, thon, yaourt grec — environ 1,8 g/kg.</p></div>
+        <div class="rule"><div class="rule-num">3</div><h3>Légumes à volonté</h3><p>Remplis la moitié de l'assiette à midi et le soir.</p></div>
+        <div class="rule"><div class="rule-num">4</div><h3>Marche tous les jours</h3><p>8 000 à 12 000 pas. C'est ce qui fait fondre le gras.</p></div>
+        <div class="rule"><div class="rule-num">5</div><h3>Pèse-toi le matin</h3><p>À jeun, après les toilettes, même heure. Note tout.</p></div>
+        <div class="rule"><div class="rule-num">6</div><h3>3 L d'eau par jour</h3><p>Coupe la faim, élimine, améliore la peau.</p></div>
+        <div class="rule"><div class="rule-num">7</div><h3>7 h de sommeil</h3><p>Sans sommeil → hormones cassées → faim incontrôlable.</p></div>
+        <div class="rule"><div class="rule-num">8</div><h3>Zéro sucre liquide</h3><p>Soda, jus, alcool. Eau, café/thé sans sucre uniquement.</p></div>
+        <div class="rule"><div class="rule-num">9</div><h3>Cuisine maison</h3><p>Tu sais ce qu'il y a dedans. Bats les industriels.</p></div>
+        <div class="rule"><div class="rule-num">10</div><h3>Patience > perfection</h3><p>1 écart ≠ échec. Reprends au prochain repas, jamais demain.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <button id="installBtn" class="install-btn" hidden>📲 Installer SB</button>
+
+  <script src="app.js"></script>
+  <script>
+    // PWA service worker registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(()=>{});
+      });
+    }
+    // Install prompt
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.hidden = false;
+    });
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.hidden = true;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>SB · Générateur d'icônes</title>
+<style>
+body{font-family:system-ui;background:#0b1020;color:#fff;padding:30px;text-align:center}
+h1{margin-bottom:10px}
+p{color:#8a93b8;margin-bottom:24px}
+canvas{border-radius:24px;margin:12px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+button{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:0;padding:14px 28px;
+border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin:8px}
+</style></head><body>
+<h1>🎨 Génération des icônes SB</h1>
+<p>Clique sur "Tout télécharger" — sauvegarde les 2 PNG dans le dossier <code>d:\sport\</code></p>
+<div>
+  <canvas id="c192" width="192" height="192"></canvas>
+  <canvas id="c512" width="512" height="512"></canvas>
+</div>
+<div>
+  <button onclick="dl(192)">⬇ icon-192.png</button>
+  <button onclick="dl(512)">⬇ icon-512.png</button>
+  <button onclick="dl(192);dl(512)">⬇ Tout télécharger</button>
+</div>
+<script>
+function draw(size){
+  const c = document.getElementById('c'+size);
+  const ctx = c.getContext('2d');
+  // Rounded background gradient
+  const r = size*0.22;
+  const g = ctx.createLinearGradient(0,0,size,size);
+  g.addColorStop(0,'#6366f1'); g.addColorStop(.55,'#8b5cf6'); g.addColorStop(1,'#ec4899');
+  ctx.fillStyle = g;
+  roundRect(ctx,0,0,size,size,r); ctx.fill();
+  // Glow
+  const rg = ctx.createRadialGradient(size*0.3,size*0.25,0,size*0.3,size*0.25,size*0.7);
+  rg.addColorStop(0,'rgba(255,255,255,.35)'); rg.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle = rg; roundRect(ctx,0,0,size,size,r); ctx.fill();
+  // SB text
+  ctx.fillStyle = '#fff';
+  ctx.font = `900 ${size*0.5}px Inter, system-ui, Arial`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = size*0.04; ctx.shadowOffsetY = size*0.02;
+  ctx.fillText('SB', size/2, size/2 + size*0.02);
+}
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+function dl(size){
+  const c = document.getElementById('c'+size);
+  const a = document.createElement('a');
+  a.download = `icon-${size}.png`;
+  a.href = c.toDataURL('image/png'); a.click();
+}
+draw(192); draw(512);
+</script></body></html>
