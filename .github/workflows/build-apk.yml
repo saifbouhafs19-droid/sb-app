@@ -34,16 +34,17 @@ jobs:
         working-directory: sb-apk
         run: npm install --no-audit --no-fund
 
-      - name: Refresh web assets into Capacitor
+      - name: Copy web assets directly to Android assets
         run: |
+          ASSETS=sb-apk/android/app/src/main/assets/public
+          mkdir -p "$ASSETS"
+          rm -rf "$ASSETS"/*
+          cp -f index.html styles.css app.js manifest.webmanifest sw.js "$ASSETS"/
+          if [ -f icon-192.png ]; then cp -f icon-192.png icon-512.png "$ASSETS"/; fi
+          # Also keep www in sync (used by capacitor.config.json reference)
           mkdir -p sb-apk/www
-          cp -f index.html styles.css app.js manifest.webmanifest sw.js sb-apk/www/
-          if [ -f icon-192.png ]; then cp -f icon-192.png icon-512.png sb-apk/www/; fi
-          ls -la sb-apk/www/
-
-      - name: Capacitor sync
-        working-directory: sb-apk
-        run: npx cap sync android
+          cp -f "$ASSETS"/* sb-apk/www/
+          ls -la "$ASSETS"
 
       - name: Write local.properties
         run: |
