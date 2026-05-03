@@ -2,7 +2,7 @@ name: Build SB APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -23,19 +23,21 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+      - name: Show pre-installed Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls "$ANDROID_HOME" || true
+          ls "$ANDROID_HOME/platforms" || true
 
       - name: Install npm dependencies
         working-directory: sb-apk
         run: npm install --no-audit --no-fund
 
-      - name: Refresh web assets
+      - name: Refresh web assets into Capacitor
         run: |
           mkdir -p sb-apk/www
-          cp -f index.html styles.css app.js manifest.webmanifest sw.js sb-apk/www/ || true
+          cp -f index.html styles.css app.js manifest.webmanifest sw.js sb-apk/www/
           if [ -f icon-192.png ]; then cp -f icon-192.png icon-512.png sb-apk/www/; fi
           ls -la sb-apk/www/
 
@@ -43,21 +45,25 @@ jobs:
         working-directory: sb-apk
         run: npx cap sync android
 
-      - name: Make gradlew executable
-        working-directory: sb-apk/android
-        run: chmod +x ./gradlew
+      - name: Write local.properties
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > sb-apk/android/local.properties
+          cat sb-apk/android/local.properties
 
       - name: Build Debug APK
         working-directory: sb-apk/android
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
-
-      - name: Stage APK
         run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Locate APK
+        run: |
+          find sb-apk/android -name "*.apk" -type f
           mkdir -p output
           cp sb-apk/android/app/build/outputs/apk/debug/app-debug.apk output/SB.apk
           ls -la output/
 
-      - name: Upload APK
+      - name: Upload SB.apk
         uses: actions/upload-artifact@v4
         with:
           name: SB-apk
